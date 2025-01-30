@@ -15,10 +15,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.16)
-
-project(saclient)
-
 if (DEFINED DISABLE_CENC_1000000_TESTS)
     set(CMAKE_CXX_FLAGS "-DDISABLE_CENC_1000000_TESTS ${CMAKE_CXX_FLAGS}")
     set(CMAKE_C_FLAGS "-DDISABLE_CENC_1000000_TESTS ${CMAKE_C_FLAGS}")
@@ -330,16 +326,16 @@ if (BUILD_TESTS)
 endif ()
 
 # Doxygen
-if (BUILD_DOC)
+if(BUILD_DOC)
     find_package(Doxygen)
-    if (DOXYGEN_FOUND)
+    if(DOXYGEN_FOUND)
         add_custom_target(saclientdocs ALL
                 COMMAND "${CMAKE_SOURCE_DIR}/../docs/generate_docs.sh"
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../docs/
                 COMMENT "Generating API documentation with Doxygen"
                 VERBATIM
                 )
-    else (DOXYGEN_FOUND)
+    else()
         message("Doxygen need to be installed to generate the doxygen documentation")
-    endif (DOXYGEN_FOUND)
-endif (BUILD_DOC)
+    endif()
+endif()

@@ -15,9 +15,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.16)
-
-project(tasecureapi-src)
+include(ClangFormat)
 
 set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ standard to be used")
 set(CMAKE_C_STANDARD 11 CACHE STRING "C standard to be used")
@@ -29,10 +27,6 @@ if (COVERAGE AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "-g -fprofile-arcs -ftest-coverage ${CMAKE_CXX_FLAGS}")
     set(CMAKE_C_FLAGS "-g -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS}")
 endif ()
-
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../cmake" ${CMAKE_MODULE_PATH})
-message("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
-include(ClangFormat)
 
 if (DEFINED ENABLE_SOC_KEY_TESTS)
     set(CMAKE_CXX_FLAGS "-DENABLE_SOC_KEY_TESTS ${CMAKE_CXX_FLAGS}")
@@ -59,10 +53,10 @@ install(TARGETS saclient EXPORT sa-client-config
 
 install(DIRECTORY client/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-if (BUILD_TESTS)
+if(BUILD_TESTS)
     install(TARGETS saclienttest taimpltest utiltest
             ARCHIVE DESTINATION lib
             LIBRARY DESTINATION lib
             RUNTIME DESTINATION bin
             )
-endif ()
+endif()

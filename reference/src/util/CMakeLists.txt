@@ -15,12 +15,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.16)
-
-project(taimpl)
-
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-
 find_package(OpenSSL REQUIRED)
 
 add_library(util STATIC
