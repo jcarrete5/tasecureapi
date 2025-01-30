@@ -21,19 +21,6 @@ project(saclientimpl)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-if (DEFINED ENABLE_CLANG_TIDY)
-    find_program(CLANG_TIDY_COMMAND NAMES clang-tidy)
-    if (CLANG_TIDY_COMMAND)
-        set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_COMMAND}; )
-        set(CMAKE_C_CLANG_TIDY ${CLANG_TIDY_COMMAND}; )
-        message("clang-tidy found--enabling")
-    else ()
-        message("clang-tidy not found")
-    endif ()
-else()
-    message("clang-tidy disabled")
-endif ()
-
 set(CMAKE_CXX_FLAGS "-D_GNU_SOURCE -fPIC ${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "-D_GNU_SOURCE -fPIC ${CMAKE_C_FLAGS}")
 
@@ -90,6 +77,15 @@ add_library(saclientimpl STATIC
         src/sa_svp_supported.c
         src/sa_svp_buffer_create.c
         )
+
+if(ENABLE_CLANG_TIDY)
+    set_target_properties(
+        saclientimpl
+        PROPERTIES
+            C_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+            CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+    )
+endif()
 
 target_include_directories(saclientimpl
         PRIVATE

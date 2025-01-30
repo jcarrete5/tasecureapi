@@ -19,28 +19,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(saclient)
 
-find_program(CLANG_TIDY_COMMAND NAMES clang-tidy)
-
-if (DEFINED ENABLE_CLANG_TIDY)
-    if (CLANG_TIDY_COMMAND)
-        set(CMAKE_C_CLANG_TIDY ${CLANG_TIDY_COMMAND}; )
-        message("clang-tidy found--enabling")
-    else ()
-        message("clang-tidy not found")
-    endif ()
-else ()
-    message("clang-tidy disabled")
-endif ()
-
-if (DEFINED ENABLE_CLANG_TIDY_TESTS)
-    if (CLANG_TIDY_COMMAND)
-        set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_COMMAND}; )
-        message("clang-tidy found--enabling for tests")
-    endif ()
-else ()
-    message("clang-tidy disabled for tests")
-endif ()
-
 if (DEFINED DISABLE_CENC_1000000_TESTS)
     set(CMAKE_CXX_FLAGS "-DDISABLE_CENC_1000000_TESTS ${CMAKE_CXX_FLAGS}")
     set(CMAKE_C_FLAGS "-DDISABLE_CENC_1000000_TESTS ${CMAKE_C_FLAGS}")
@@ -79,6 +57,15 @@ add_library(saclient SHARED
         src/sa_public_key.h
         src/sa_public_key.c
         )
+
+if(ENABLE_CLANG_TIDY)
+    set_target_properties(
+        saclient
+        PROPERTIES
+            C_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+            CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+    )
+endif()
 
 target_compile_options(saclient PRIVATE -Werror -Wall -Wextra -Wno-type-limits -Wno-unused-parameter
         -Wno-deprecated-declarations)
@@ -286,6 +273,15 @@ if (BUILD_TESTS)
             test/sa_svp_key_check.cpp
             test/sa_svp_common.cpp
             test/sa_svp_common.h)
+
+    if(ENABLE_CLANG_TIDY_TEST)
+        set_target_properties(
+            saclienttest
+            PROPERTIES
+                C_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+                CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+        )
+    endif()
 
     target_compile_options(saclienttest PRIVATE -Werror -Wall -Wextra -Wno-type-limits -Wno-unused-parameter
             -Wno-deprecated-declarations)

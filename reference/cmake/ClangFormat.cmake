@@ -4,42 +4,29 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 
 function(prefix_clangformat_setup prefix)
-    if(NOT CLANGFORMAT_EXECUTABLE)
-         set(CLANGFORMAT_EXECUTABLE clang-format)
+    set(target "${prefix}_clangformat")
+
+    if(NOT CLANG_FORMAT_EXECUTABLE)
+        # Avoid adding targets that use clang-format if it doesn't exist
+        return()
     endif()
 
-    if(NOT EXISTS ${CLANGFORMAT_EXECUTABLE})
-        find_program(clangformat_executable_tmp ${CLANGFORMAT_EXECUTABLE})
-        if(clangformat_executable_tmp)
-            message("clang-format found--enabling")
-            set(CLANGFORMAT_EXECUTABLE ${clangformat_executable_tmp})
-            unset(clangformat_executable_tmp)
-        else()
-            message("clang-format not found")
-        endif()
-    endif()
-
-    foreach(clangformat_source ${ARGN})
-        get_filename_component(clangformat_source ${clangformat_source} ABSOLUTE)
-        list(APPEND clangformat_sources ${clangformat_source})
+    foreach(source_file ${ARGN})
+        get_filename_component(source_file_path "${source_file}" ABSOLUTE)
+        list(APPEND sources "${source_file_path}")
     endforeach()
 
-    add_custom_target(${prefix}_clangformat
-            COMMAND
-            ${CLANGFORMAT_EXECUTABLE}
-            -style=file
-            -i
-            ${clangformat_sources}
-            WORKING_DIRECTORY
-            ${CMAKE_SOURCE_DIR}
-            COMMENT
-            "Formatting ${prefix} with ${CLANGFORMAT_EXECUTABLE} ..."
-            )
+    add_custom_target(
+        "${target}"
+        COMMAND "${CLANG_FORMAT_EXECUTABLE}" --style=file -i ${sources}
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        COMMENT "Formatting ${prefix} with ${CLANG_FORMAT_EXECUTABLE} ..."
+    )
 
     if(TARGET clangformat)
-        add_dependencies(clangformat ${prefix}_clangformat)
+        add_dependencies(clangformat "${target}")
     else()
-        add_custom_target(clangformat DEPENDS ${prefix}_clangformat)
+        add_custom_target(clangformat DEPENDS "${target}")
     endif()
 endfunction()
 

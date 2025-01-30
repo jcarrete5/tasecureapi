@@ -21,19 +21,6 @@ project(taimpl)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-if (DEFINED ENABLE_CLANG_TIDY)
-    find_program(CLANG_TIDY_COMMAND NAMES clang-tidy)
-    if (CLANG_TIDY_COMMAND)
-        set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_COMMAND}; )
-        set(CMAKE_C_CLANG_TIDY ${CLANG_TIDY_COMMAND}; )
-        message("clang-tidy found--enabling")
-    else ()
-        message("clang-tidy not found")
-    endif ()
-else ()
-    message("clang-tidy disabled")
-endif ()
-
 if (DEFINED SA_LOG_LEVEL)
     set(CMAKE_CXX_FLAGS "-DSA_LOG_LEVEL=${SA_LOG_LEVEL} ${CMAKE_CXX_FLAGS}")
     set(CMAKE_C_FLAGS "-DSA_LOG_LEVEL=${SA_LOG_LEVEL} ${CMAKE_C_FLAGS}")
@@ -174,6 +161,15 @@ add_library(taimpl STATIC
         src/ta_sa_svp_key_check.c
         src/ta_sa_svp_supported.c)
 
+if(ENABLE_CLANG_TIDY)
+    set_target_properties(
+        taimpl
+        PROPERTIES
+            C_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+            CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+    )
+endif()
+
 target_include_directories(taimpl
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -223,6 +219,15 @@ if (BUILD_TESTS)
             test/ta_sa_svp_crypto.cpp
             test/ta_sa_svp_crypto.h
             test/ta_sa_svp_key_check.cpp)
+
+    if(ENABLE_CLANG_TIDY_TEST)
+        set_target_properties(
+            taimpltest
+            PROPERTIES
+                C_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+                CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+        )
+    endif()
 
     target_include_directories(taimpltest
             PRIVATE

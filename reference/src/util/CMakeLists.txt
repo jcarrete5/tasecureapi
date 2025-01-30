@@ -21,19 +21,6 @@ project(taimpl)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-if (DEFINED ENABLE_CLANG_TIDY)
-    find_program(CLANG_TIDY_COMMAND NAMES clang-tidy)
-    if (CLANG_TIDY_COMMAND)
-        set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_COMMAND}; )
-        set(CMAKE_C_CLANG_TIDY ${CLANG_TIDY_COMMAND}; )
-        message("clang-tidy found--enabling")
-    else ()
-        message("clang-tidy not found")
-    endif ()
-else ()
-    message("clang-tidy disabled")
-endif ()
-
 find_package(OpenSSL REQUIRED)
 
 add_library(util STATIC
@@ -54,6 +41,15 @@ add_library(util STATIC
         src/test_helpers.cpp
         src/test_process_common_encryption.cpp
         )
+
+if(ENABLE_CLANG_TIDY)
+    set_target_properties(
+        util
+        PROPERTIES
+            C_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+            CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+    )
+endif()
 
 target_include_directories(util
         PUBLIC
@@ -77,6 +73,15 @@ if (BUILD_TESTS)
     add_executable(utiltest
             test/pkcs12test.cpp
             )
+
+    if(ENABLE_CLANG_TIDY_TEST)
+        set_target_properties(
+            utiltest
+            PROPERTIES
+                C_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+                CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND_LINE}"
+        )
+    endif()
 
     target_include_directories(utiltest
             PRIVATE
