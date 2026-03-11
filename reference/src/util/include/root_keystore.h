@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 Comcast Cable Communications Management, LLC
+ * Copyright 2025-2026 Comcast Cable Communications Management, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,21 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#ifdef ENABLE_SVP
-#include "log.h"
-#include "sa.h"
-#include "ta_client.h"
 
-sa_status sa_svp_memory_alloc(
-        void** svp_memory,
-        size_t size) {
+#ifndef ROOT_KEYSTORE_H
+#define ROOT_KEYSTORE_H
 
-    if (svp_memory == NULL) {
-        ERROR("NULL svp_memory");
-        return SA_STATUS_NULL_PARAMETER;
-    }
+#include <stddef.h>
+#include <stdint.h>
 
-    // TODO SoC Vendor: replace this call with a call to allocate secure memory.
-    *svp_memory = malloc(size);
-    if (*svp_memory == NULL) {
-        ERROR("malloc failed");
-        return SA_STATUS_INTERNAL_ERROR;
-    }
+#define DEFAULT_ROOT_KEYSTORE_PASSWORD "password01234567"
+#define COMMON_ROOT_NAME "commonroot"
 
-    return SA_STATUS_OK;
-}
-#endif // ENABLE_SVP
+/// A PKCS#12 container containing a secret key encrypted with the
+/// `DEFAULT_ROOT_KEYSTORE_PASSWORD`.
+extern const uint8_t default_root_keystore[];
+
+/// Size of the `default_root_keystore`
+extern const size_t default_root_keystore_size;
+
+#endif /* ROOT_KEYSTORE_H */

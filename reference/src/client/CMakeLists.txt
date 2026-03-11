@@ -1,5 +1,5 @@
 #
-# Copyright 2020-2023 Comcast Cable Communications Management, LLC
+# Copyright 2020-2025 Comcast Cable Communications Management, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ target_compile_options(saclient PRIVATE -Werror -Wall -Wextra -Wno-type-limits -
 set_target_properties(saclient PROPERTIES
         LINKER_LANGUAGE C
         SO_VERSION 3.4
-        VERSION 3.4.0
+        VERSION 3.4.1
         )
 
 target_include_directories(saclient
@@ -128,11 +128,10 @@ target_clangformat_setup(saclient)
 
 if (BUILD_TESTS)
     # Google test
-    add_executable(saclienttest
+    set(SACLIENT_TEST_SOURCES
             test/client_test_helpers.cpp
             test/client_test_helpers.h
             test/environment.cpp
-            test/sa_client_thread_test.cpp
             test/sa_crypto_cipher_common.h
             test/sa_crypto_cipher_common.cpp
             test/sa_crypto_cipher_init.cpp
@@ -277,15 +276,25 @@ if (BUILD_TESTS)
             test/sa_provider_mac.cpp
             test/sa_provider_pkcs7.cpp
             test/sa_provider_signature.cpp
-            test/sa_svp_buffer_alloc.cpp
-            test/sa_svp_buffer_check.cpp
-            test/sa_svp_buffer_copy.cpp
-            test/sa_svp_buffer_create.cpp
-            test/sa_svp_buffer_release.cpp
-            test/sa_svp_buffer_write.cpp
-            test/sa_svp_key_check.cpp
-            test/sa_svp_common.cpp
-            test/sa_svp_common.h)
+            )
+    # Conditionally add files if ENABLE_SVP is defined
+    if(ENABLE_SVP)
+         list(APPEND SACLIENT_TEST_SOURCES
+	    test/sa_client_thread_test.cpp
+	    test/sa_svp_buffer_alloc.cpp
+	    test/sa_svp_buffer_check.cpp
+	    test/sa_svp_buffer_copy.cpp
+	    test/sa_svp_buffer_create.cpp
+	    test/sa_svp_buffer_release.cpp
+	    test/sa_svp_buffer_write.cpp
+	    test/sa_svp_key_check.cpp
+	    test/sa_svp_common.cpp
+	    test/sa_svp_common.h
+            )
+    endif()
+
+
+    add_executable(saclienttest ${SACLIENT_TEST_SOURCES})
 
     target_compile_options(saclienttest PRIVATE -Werror -Wall -Wextra -Wno-type-limits -Wno-unused-parameter
             -Wno-deprecated-declarations)
@@ -326,6 +335,7 @@ if (BUILD_TESTS)
 
     add_custom_command(
             TARGET saclienttest POST_BUILD
+            BYPRODUCTS root_keystore.p12
             COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_SOURCE_DIR}/test/root_keystore.p12
             ${CMAKE_CURRENT_BINARY_DIR}/root_keystore.p12)
